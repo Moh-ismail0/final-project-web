@@ -9,21 +9,20 @@ use App\Http\Controllers\CommentController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AdminAuthController;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', function () { return view('welcome');
+})->name('home-login');;
 
 // User Auth Routes
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
-Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // Admin Auth Routes
 Route::get('/admin/login', [AdminAuthController::class, 'showLogin'])->name('admin.login');
 Route::post('/admin/login', [AdminAuthController::class, 'login']);
-Route::post('/admin/logout', [AdminAuthController::class, 'logout'])->name('admin.logout');
+Route::get('/admin/logout', [AdminAuthController::class, 'logout'])->name('admin.logout');
 
-// Protected Routes
+// Protected Routes - Users
 Route::middleware('auth')->group(function () {
     Route::prefix('dashboard')->group(function () {
         Route::get('/', [TaskController::class, 'dashboard'])->name('dashboard');
@@ -39,8 +38,12 @@ Route::middleware('auth')->group(function () {
         Route::post('tasks_update/{id}', [TaskController::class, 'update'])->name('tasks.update');
         Route::resource('tasks', TaskController::class);
         Route::resource('categories', CategoryController::class);
-        Route::get('admins', [AdminController::class, 'index'])->name('admins.index');
-        Route::post('admins', [AdminController::class, 'store'])->name('admins.store');
-        Route::delete('admins/{admin}', [AdminController::class, 'destroy'])->name('admins.destroy');
     });
+});
+
+// Protected Routes - Admins
+Route::middleware('auth:admin')->prefix('dashboard')->group(function () {
+    Route::get('admins', [AdminController::class, 'index'])->name('admins.index');
+    Route::post('admins', [AdminController::class, 'store'])->name('admins.store');
+    Route::delete('admins/{admin}', [AdminController::class, 'destroy'])->name('admins.destroy');
 });

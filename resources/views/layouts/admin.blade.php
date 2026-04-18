@@ -36,16 +36,19 @@
     <ul class="navbar-nav ml-auto">
       <li class="nav-item">
         <span class="nav-link">
-          <i class="fas fa-user mr-1"></i> {{ Auth::user()->name }}
+          <i class="fas fa-user mr-1"></i> {{ Auth::guard('admin')->check() ? Auth::guard('admin')->user()->name : Auth::user()->name }}
         </span>
       </li>
       <li class="nav-item">
-        <form method="POST" action="{{ route('admin.logout') }}">
-    @csrf
-    <button type="submit" class="nav-link btn btn-link" style="cursor:pointer;">
-        <i class="fas fa-sign-out-alt"></i> Logout
-    </button>
-</form>
+@if(Auth::guard('admin')->check())
+    <a href="{{ route('admin.logout') }}" class="nav-link">
+        <i class="fas fa-sign-out-alt mr-1"></i>Logout
+    </a>
+@else
+    <a href="{{ route('logout') }}" class="nav-link">
+        <i class="fas fa-sign-out-alt mr-1"></i>Logout
+    </a>
+@endif
       </li>
     </ul>
   </nav>
@@ -142,13 +145,16 @@
 
           {{-- Logout --}}
           <li class="nav-item">
-            <form method="POST" action="{{ route('logout') }}">
-              @csrf
-              <button type="submit" class="nav-link btn btn-link" style="width:100%; text-align:left;">
-                <i class="nav-icon fas fa-sign-out-alt"></i>
-                <p>Logout</p>
-              </button>
-            </form>
+@if(Auth::guard('admin')->check())
+    <a href="{{ route('admin.logout') }}" class="nav-link">
+        <i class="fas fa-sign-out-alt"></i> Logout
+    </a>
+@else
+    <a href="{{ route('logout') }}" class="nav-link">
+        <i class="nav-icon fas fa-sign-out-alt"></i>
+        <p>Logout</p>
+    </a>
+@endif
           </li>
 
         </ul>
@@ -181,7 +187,7 @@
   <footer class="main-footer">
     <strong>Copyright &copy;{{ now()->year }} <a href="#">Task Manager</a>.</strong> All rights reserved.
     <div class="float-right d-none d-sm-inline-block">
-      <b>{{ Auth::user()->name }}</b>
+      <b>{{ Auth::guard('admin')->check() ? Auth::guard('admin')->user()->name : Auth::user()->name }}</b>
     </div>
   </footer>
 

@@ -32,6 +32,7 @@
                     </div>
                 </div>
                 <button type="submit" class="btn btn-primary btn-block">Sign In</button>
+                <a href="{{ route('home-login') }}" class="btn btn-secondary btn-block">Exit</a>
             </form>
         </div>
     </div>
