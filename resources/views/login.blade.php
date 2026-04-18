@@ -1,32 +1,45 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Login</title>
-    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
-</head>
-<body>
-    <div class="container" style="max-width: 400px">
-        <div class="card">
-            <h2 style="text-align: center">Login</h2>
+    <title>Admin Login</title>
+    <link rel="stylesheet" href="{{ asset('cms/dist/css/adminlte.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('cms/plugins/fontawesome-free/css/all.min.css') }}">
 
-            {{-- عرض الأخطاء --}}
+</head>
+<body class="hold-transition login-page">
+<div class="login-box">
+    <div class="login-logo"><b>Task Manager</b> User</div>
+    <div class="card">
+        <div class="card-body login-card-body">
+            <p class="login-box-msg">Sign in as User</p>
+
             @if($errors->any())
-                <div style="color:red; margin-bottom:10px;">
-                    {{ $errors->first() }}
-                </div>
+                <div class="alert alert-danger">{{ $errors->first() }}</div>
             @endif
 
             <form method="POST" action="/login">
                 @csrf
-                <label>Email</label>
-                <input type="email" name="email" placeholder="example@email.com"/>
-
-                <label>Password</label>
-                <input type="password" name="password" placeholder="********"/>
-
-                <button style="width:100%">Login</button>
+                <div class="input-group mb-3">
+                    <input type="email" name="email" class="form-control" placeholder="Email">
+                    <div class="input-group-append">
+                        <div class="input-group-text"><i class="fas fa-envelope"></i></div>
+                    </div>
+                </div>
+                <div class="input-group mb-3">
+                    <input type="password" name="password" class="form-control" placeholder="Password">
+                    <div class="input-group-append">
+                        <div class="input-group-text"><i class="fas fa-lock"></i></div>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Sign In</button>
             </form>
         </div>
     </div>
+</div>
+<script src="{{ asset('cms/plugins/jquery/jquery.min.js') }}"></script>
+<script src="{{ asset('cms/plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+<script src="{{ asset('cms/dist/js/adminlte.js') }}"></script>
+<script src="{{ asset('js/axios.min.js') }}"></script>
+<script src="{{ asset('js/sweetalert2.min.js') }}"></script>
 </body>
 </html>

@@ -2,7 +2,7 @@
 <html>
 <head>
     <title>Admin Login</title>
-    <link rel="stylesheet" href="{{ asset('cms//css/adminlte.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('cms/dist/css/adminlte.min.css') }}">
     <link rel="stylesheet" href="{{ asset('cms/plugins/fontawesome-free/css/all.min.css') }}">
 
 </head>
