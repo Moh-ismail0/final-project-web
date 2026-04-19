@@ -11,7 +11,7 @@ class Task extends Model
     /** @use HasFactory<\Database\Factories\TaskFactory> */
     use HasFactory, SoftDeletes;
         protected $fillable = [
-        'title', 'description', 'status', 'due_date', 'category_id', 'user_id'
+        'title', 'description', 'status', 'due_date', 'category_id', 'user_id' ,'is_starred'
     ];
 
     public function category()

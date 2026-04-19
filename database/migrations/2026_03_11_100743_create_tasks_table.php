@@ -20,6 +20,7 @@ return new class extends Migration
         $table->foreignId('category_id')->constrained()->onDelete('cascade');
         $table->foreignId('user_id')->constrained()->onDelete('cascade');
         $table->softDeletes();
+        $table->boolean('is_starred')->default(false);
         $table->timestamps();
         });
     }

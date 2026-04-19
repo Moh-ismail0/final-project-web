@@ -23,17 +23,23 @@
                     </a>
     </div>
 </div>
-            <div class="card-body">
-                <form method="GET" action="{{ route('tasks.index') }}" style="display:flex; gap:10px;">
-                    <select name="status" class="form-control" style="width:200px;">
-                        <option value="">All Tasks</option>
-                        <option value="Pending" {{ request('status') == 'Pending' ? 'selected' : '' }}>Pending</option>
-                        <option value="Completed" {{ request('status') == 'Completed' ? 'selected' : '' }}>Completed</option>
+<div class="card-body">
+    <form method="GET" action="{{ route('tasks.index') }}" style="display: flex; gap: 10px; align-items: stretch;">
 
-                    </select>
-                    <button class="btn btn-primary" type="submit">Filter</button>
-                </form>
-            </div>
+        <select name="status" class="form-select" style="width: 200px;">
+            <option value="">All Tasks</option>
+            <option value="Pending" {{ request('status') == 'Pending' ? 'selected' : '' }}>Pending</option>
+            <option value="Completed" {{ request('status') == 'Completed' ? 'selected' : '' }}>Completed</option>
+        </select>
+
+        <button class="btn btn-primary" type="submit" style="white-space: nowrap;">Filter</button>
+
+        <input type="text" id="search-input" name="search" class="form-control"
+               placeholder="Search tasks by title, category or owner..."
+               value="{{ request('search') }}" style="flex-grow: 1;">
+
+    </form>
+</div>
         </div>
 
         <div class="card">
@@ -42,34 +48,69 @@
                     <thead>
                         <tr>
                             <th>#</th>
+
                             <th>Title</th>
                             <th>Description</th>
                             <th>Status</th>
                             <th>Category</th>
                             <th>Owner</th>
                             <th>Due Date</th>
-                            <th>Actions</th>
+                            <th class="text-center">Actions</th>
+
                         </tr>
                     </thead>
                     <tbody>
                     @forelse($tasks as $task)
                     <tr id="task-{{ $task->id }}">
     <td>{{ $task->id }}</td>
-    <td>{{ $task->title }}</td>
+<td>
+    <i class="fa-star {{ $task->is_starred ? 'fas text-warning' : 'far' }}"
+       style="cursor:pointer" onclick="toggleStar({{ $task->id }}, this)"></i>
+    {{ $task->title }}
+</td>
     <td>{{ $task->description }}</td>
     <td>{{ $task->status }}</td>
     <td>{{ $task->category->name ?? '-' }}</td>
     <td>{{ $task->user->name ?? '-' }}</td>
-    <td style="color: {{ $task->due_date && \Carbon\Carbon::parse($task->due_date)->isPast() ? 'red' : 'inherit' }}">
-        {{ $task->due_date ?? '-' }}
-    </td>
+<td>
+    @if($task->due_date)
+        @php
+            $diff = (int) now()->diffInDays($task->due_date, false);
+        @endphp
 
-    <td>
+        @if($diff < 0)
+            <span class="badge badge-danger">
+                <i class="fas fa-times-circle"></i> Overdue
+            </span>
+        @elseif($diff == 0)
+            <span class="badge badge-warning blink">
+                <i class="fas fa-exclamation-circle"></i> Today!
+            </span>
+        @elseif($diff <= 2)
+            <span class="badge badge-warning blink">
+                <i class="fas fa-clock"></i> {{ $diff }} day(s) left
+            </span>
+        @else
+            <span class="badge badge-info">
+                <i class="fas fa-calendar"></i> {{ $diff }} days left
+            </span>
+        @endif
+    @else
+        <span class="text-muted">-</span>
+    @endif
+</td>
+
+    <td class="text-center text-nowrap">
+        <button class="btn btn-sm {{ $task->status == 'Completed' ? 'btn-secondary' : 'btn-outline-success' }}"
+        onclick="toggleTaskStatus({{ $task->id }}, this)">
+    <i class="fas fa-check-circle"></i>
+</button>
+
 
         <a href="{{ route('tasks.edit', $task->id) }}" class="btn btn-success btn-sm">Edit</a>
         <button class="btn btn-danger btn-sm" onclick="performDestroy({{ $task->id }}, this)">Delete</button>
         <button class="btn btn-info btn-sm" onclick="toggleComments({{ $task->id }})">
-            <i class="fas fa-comments"></i> Comments ({{ $task->comments->count() }})
+        <i class="text-center"></i> Comments ({{ $task->comments->count() }})
         </button>
 
     </td>
@@ -149,6 +190,40 @@
         let row = document.getElementById('comments-' + taskId);
         row.style.display = row.style.display === 'none' ? '' : 'none';
     }
+
+$('#search-input').on('keyup', function() {
+    let value = $(this).val().toLowerCase();
+    $("table tbody tr").filter(function() {
+        // نتأكد من عدم إخفاء صفوف التعليقات بالخطأ
+        if(!$(this).attr('id') || !$(this).attr('id').includes('comments')) {
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+        }
+    });
+});
+
+function toggleTaskStatus(id, btn) {
+    axios.post(`/dashboard/tasks/${id}/toggle-status`)
+        .then(response => {
+            if(response.data.success) {
+                location.reload();
+            }
+        });
+}
+
+function toggleStar(id, icon) {
+    axios.post(`/dashboard/tasks/${id}/toggle-star`)
+        .then(response => {
+            if (response.data.success) {
+                if (response.data.is_starred) {
+                    icon.classList.remove('far');
+                    icon.classList.add('fas', 'text-warning');
+                } else {
+                    icon.classList.remove('fas', 'text-warning');
+                    icon.classList.add('far');
+                }
+            }
+        });
+}
 
 </script>
 @endsection

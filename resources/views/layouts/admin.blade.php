@@ -13,6 +13,7 @@
   <link rel="stylesheet" href="{{ asset('cms/dist/css/adminlte.min.css') }}">
   <!-- Toastr -->
   <link rel="stylesheet" href="{{ asset('cms/plugins/overlayScrollbars/css/OverlayScrollbars.min.css') }}">
+  <link rel="stylesheet" href="{{ asset('css/style.css') }}">
 
   @yield('styles')
 </head>

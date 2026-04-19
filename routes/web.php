@@ -36,6 +36,8 @@ Route::middleware('auth')->group(function () {
         Route::post('categories/{id}/comments', [CommentController::class, 'storeForCategory'])->name('categories.comments.store');
         Route::delete('comments/{id}', [CommentController::class, 'destroy'])->name('comments.destroy');
         Route::post('tasks_update/{id}', [TaskController::class, 'update'])->name('tasks.update');
+        Route::post('tasks/{id}/toggle-status', [TaskController::class, 'toggleStatus'])->name('tasks.toggleStatus');
+        Route::post('tasks/{task}/toggle-star', [TaskController::class, 'toggleStar'])->name('tasks.toggleStar');
         Route::resource('tasks', TaskController::class);
         Route::resource('categories', CategoryController::class);
     });

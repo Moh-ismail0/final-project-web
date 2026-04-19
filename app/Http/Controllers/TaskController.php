@@ -16,12 +16,13 @@ public function dashboard()
         ? Task::with('category')
         : Task::where('user_id', Auth::id())->with('category');
 
-    $tasks = $query->latest()->take(3)->get();
-    $total = $query->count();
-    $completed = $query->where('status', 'Completed')->count();
+    $tasks     = (clone $query)->orderBy('is_starred', 'desc')->latest()->take(3)->get();
+    $total     = (clone $query)->count();
+    $completed = (clone $query)->where('status', 'Completed')->count();
 
     return view('dashboard', compact('tasks', 'total', 'completed'));
 }
+
 public function index()
 {
     $query = Auth::guard('admin')->check()
@@ -32,7 +33,7 @@ public function index()
         $query->where('status', request('status'));
     }
 
-    $tasks = $query->paginate(5);
+    $tasks      = $query->orderBy('is_starred', 'desc')->latest()->paginate(5);
     $categories = Category::all();
 
     return view('tasks', compact('tasks', 'categories'));
@@ -148,6 +149,23 @@ public function forceDeleteAll()
     return response()->json([
         'icon'  => 'success',
         'title' => 'All Tasks Permanently Deleted!'
+    ]);
+}
+
+public function toggleStatus($id) {
+    $task = Task::findOrFail($id);
+    $task->status = ($task->status == 'Pending') ? 'Completed' : 'Pending';
+    $task->save();
+    return response()->json(['success' => true, 'new_status' => $task->status]);
+}
+public function toggleStar(Task $task)
+{
+    $task->is_starred = !$task->is_starred;
+    $task->save();
+
+    return response()->json([
+        'success'    => true,
+        'is_starred' => $task->is_starred,
     ]);
 }
 
