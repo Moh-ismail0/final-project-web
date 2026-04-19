@@ -59,7 +59,8 @@
                     <tbody>
                         @forelse($tasks as $task)
                         <tr>
-                            <td>{{ $task->id }}</td>
+<td>{{ $loop->iteration }}</td>
+
                             <td>{{ $task->title }}</td>
                             <td>
                                <span class="badge badge-{{ $task->status == 'Completed' ? 'success' : 'warning' }}">
@@ -67,8 +68,32 @@
                              </span>
                            </td>
                             <td>{{ $task->category->name ?? '-' }}</td>
-                            <td style="color: {{ $task->due_date && \Carbon\Carbon::parse($task->due_date)->isPast() ? 'red' : 'inherit' }}">
-    {{ $task->due_date ?? '-' }}
+                           <td>
+    @if($task->due_date)
+        @php
+            $diff = (int) now()->diffInDays($task->due_date, false);
+        @endphp
+
+        @if($diff < 0)
+            <span class="badge badge-danger">
+                <i class="fas fa-times-circle"></i> Overdue
+            </span>
+        @elseif($diff == 0)
+            <span class="badge badge-warning blink">
+                <i class="fas fa-exclamation-circle"></i> Today!
+            </span>
+        @elseif($diff <= 2)
+            <span class="badge badge-warning blink">
+                <i class="fas fa-clock"></i> {{ $diff }} day(s) left
+            </span>
+        @else
+            <span class="badge badge-info">
+                <i class="fas fa-calendar"></i> {{ $diff }} days left
+            </span>
+        @endif
+    @else
+        <span class="text-muted">-</span>
+    @endif
 </td>
                         </tr>
                         @empty

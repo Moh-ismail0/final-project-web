@@ -24,21 +24,31 @@
     </div>
 </div>
 <div class="card-body">
-    <form method="GET" action="{{ route('tasks.index') }}" style="display: flex; gap: 10px; align-items: stretch;">
+    <form method="GET" action="{{ route('tasks.index') }}" class="row g-2 mb-3">
+    <div class="col-md-4">
+       <input type="text" name="search" id="search-input" class="form-control" placeholder="Start typing to search..." value="{{ request('search') }}" autocomplete="off">
 
-        <select name="status" class="form-select" style="width: 200px;">
-            <option value="">All Tasks</option>
+    </div>
+    <div class="col-md-3">
+        <select name="status" class="form-control">
+            <option value="">All Statuses</option>
             <option value="Pending" {{ request('status') == 'Pending' ? 'selected' : '' }}>Pending</option>
             <option value="Completed" {{ request('status') == 'Completed' ? 'selected' : '' }}>Completed</option>
         </select>
+    </div>
+    <div class="col-md-3">
+        <select name="category_id" class="form-control">
+            <option value="">All Categories</option>
+            @foreach($categories as $cat)
+                <option value="{{ $cat->id }}" {{ request('category_id') == $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
+            @endforeach
+        </select>
+    </div>
+    <div class="col-md-2">
+        <button class="btn btn-primary w-100" type="submit"><i class="fas fa-search"></i> Filter</button>
+    </div>
+</form>
 
-        <button class="btn btn-primary" type="submit" style="white-space: nowrap;">Filter</button>
-
-        <input type="text" id="search-input" name="search" class="form-control"
-               placeholder="Search tasks by title, category or owner..."
-               value="{{ request('search') }}" style="flex-grow: 1;">
-
-    </form>
 </div>
         </div>
 
@@ -48,9 +58,7 @@
                     <thead>
                         <tr>
                             <th>#</th>
-
                             <th>Title</th>
-                            <th>Description</th>
                             <th>Status</th>
                             <th>Category</th>
                             <th>Owner</th>
@@ -62,13 +70,24 @@
                     <tbody>
                     @forelse($tasks as $task)
                     <tr id="task-{{ $task->id }}">
-    <td>{{ $task->id }}</td>
-<td>
-    <i class="fa-star {{ $task->is_starred ? 'fas text-warning' : 'far' }}"
-       style="cursor:pointer" onclick="toggleStar({{ $task->id }}, this)"></i>
-    {{ $task->title }}
+  <td>
+    {{ ($tasks->currentPage() - 1) * $tasks->perPage() + $loop->iteration }}
 </td>
-    <td>{{ $task->description }}</td>
+
+<td title="{{ $task->description }}" style="cursor: help;">
+    <!-- أيقونة النجمة للمهام المفضلة -->
+    <i class="fa-star {{ $task->is_starred ? 'fas text-warning' : 'far' }} mr-2"
+       style="cursor:pointer" onclick="toggleStar({{ $task->id }}, this)"></i>
+
+    <!-- أيقونة المعلومات (تظهر الوصف عند الوقوف عليها) -->
+    <i class="fas fa-info-circle text-info mr-1"></i>
+
+    <!-- عنوان المهمة -->
+    <span class="font-weight-bold">{{ $task->title }}</span>
+</td>
+
+
+
     <td>{{ $task->status }}</td>
     <td>{{ $task->category->name ?? '-' }}</td>
     <td>{{ $task->user->name ?? '-' }}</td>

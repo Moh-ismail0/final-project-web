@@ -23,21 +23,35 @@ public function dashboard()
     return view('dashboard', compact('tasks', 'total', 'completed'));
 }
 
-public function index()
+public function index(Request $request)
 {
     $query = Auth::guard('admin')->check()
         ? Task::with(['category', 'comments', 'user'])
         : Task::where('user_id', Auth::id())->with(['category', 'comments']);
 
-    if (request('status')) {
-        $query->where('status', request('status'));
+    // فلتر الحالة
+    if ($request->filled('status')) {
+        $query->where('status', $request->status);
     }
 
-    $tasks      = $query->orderBy('is_starred', 'desc')->latest()->paginate(5);
-    $categories = Category::all();
+    // فلتر التصنيف (Category)
+    if ($request->filled('category_id')) {
+        $query->where('category_id', $request->category_id);
+    }
 
+    // البحث بالاسم (Server-side)
+    if ($request->filled('search')) {
+        $query->where('title', 'like', '%' . $request->search . '%');
+    }
+
+    $tasks = $query->orderBy('is_starred', 'desc') // النجوم أولاً
+                   ->orderBy('due_date', 'asc')    // ثم الأقرب موعداً
+                   ->paginate(5);
+
+    $categories = Category::all();
     return view('tasks', compact('tasks', 'categories'));
 }
+
 
     // فورم إضافة مهمة
 public function create()
