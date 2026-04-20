@@ -69,23 +69,6 @@
 
 @section('scripts')
 <script>
-    function performRestore(id, reference) {
-        Swal.fire({
-            title: 'Restore Task?',
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonColor: '#28a745',
-            confirmButtonText: 'Yes, Restore!'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                axios.post('/dashboard/tasks/' + id + '/restore')
-                    .then(function(response) {
-                        showMessage(response.data);
-                        reference.closest('tr').remove();
-                    });
-            }
-        });
-    }
 
     function performForceDelete(id, reference) {
         confirmDestroy('/dashboard/tasks/' + id + '/force-delete', reference);

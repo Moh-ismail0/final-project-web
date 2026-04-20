@@ -124,14 +124,13 @@ function updatePage(url, data) {
 
 function confirmDestroy(url, td) {
     Swal.fire({
-        title: 'هل أنت متأكد من عملية الحذف ؟',
-        text: "لا يمكن التراجع عن عملية الحذف",
+        title: 'Delete This Tasks?',
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',
-        confirmButtonText: 'نعم',
-        cancelButtonText: 'لا',
+        confirmButtonText: 'Yes!',
+        cancelButtonText: 'Cancel',
     }).then((result) => {
         if (result.isConfirmed) {
             destroy(url, td);
@@ -186,8 +185,6 @@ function storeWithValidation(url, data) {
         });
 }
 
-
-
 function destroy(url, td) {
     axios.delete(url)
         .then(function (response) {
@@ -220,9 +217,6 @@ function restoreAll() {
 function forceDeleteAll() {
     confirmDestroy('/dashboard/tasks/force-delete-all', document.querySelector('tbody'));
 }
-
-
-
 
 function showErrorMessages(errors) {
 
@@ -334,6 +328,79 @@ function addCategory(url, formData) {
                     title: 'Validation Error',
                     text: messages,
                 });
+            }
+        });
+}
+    function performRestore(id, reference) {
+        Swal.fire({
+            title: 'Restore Task?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#28a745',
+            confirmButtonText: 'Yes, Restore!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                axios.post('/dashboard/tasks/' + id + '/restore')
+                    .then(function(response) {
+                        showMessage(response.data);
+                        reference.closest('tr').remove();
+                    });
+            }
+        });
+    }
+    function destroyAll() {
+        Swal.fire({
+            title: 'Delete All Tasks?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            confirmButtonText: 'Yes!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                axios.delete('/dashboard/tasks/destroy-all')
+                    .then(function(response) {
+                        showMessage(response.data);
+                        setTimeout(() => location.reload(), 1500);
+                    });
+            }
+        });
+    }
+
+        function toggleComments(taskId) {
+        let row = document.getElementById('comments-' + taskId);
+        row.style.display = row.style.display === 'none' ? '' : 'none';
+    }
+
+$('#search-input').on('keyup', function() {
+    let value = $(this).val().toLowerCase();
+    $("table tbody tr").filter(function() {
+        // نتأكد من عدم إخفاء صفوف التعليقات بالخطأ
+        if(!$(this).attr('id') || !$(this).attr('id').includes('comments')) {
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+        }
+    });
+});
+
+function toggleTaskStatus(id, btn) {
+    axios.post(`/dashboard/tasks/${id}/toggle-status`)
+        .then(response => {
+            if(response.data.success) {
+                location.reload();
+            }
+        });
+}
+
+function toggleStar(id, icon) {
+    axios.post(`/dashboard/tasks/${id}/toggle-star`)
+        .then(response => {
+            if (response.data.success) {
+                if (response.data.is_starred) {
+                    icon.classList.remove('far');
+                    icon.classList.add('fas', 'text-warning');
+                } else {
+                    icon.classList.remove('fas', 'text-warning');
+                    icon.classList.add('far');
+                }
             }
         });
 }

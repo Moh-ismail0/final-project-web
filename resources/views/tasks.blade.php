@@ -58,7 +58,7 @@
                     <thead>
                         <tr>
                             <th>#</th>
-                            <th>Title</th>
+                            <th class="text-center">Title Task</th>
                             <th>Status</th>
                             <th>Category</th>
                             <th>Owner</th>
@@ -75,14 +75,14 @@
 </td>
 
 <td title="{{ $task->description }}" style="cursor: help;">
-    <!-- أيقونة النجمة للمهام المفضلة -->
+
     <i class="fa-star {{ $task->is_starred ? 'fas text-warning' : 'far' }} mr-2"
        style="cursor:pointer" onclick="toggleStar({{ $task->id }}, this)"></i>
 
-    <!-- أيقونة المعلومات (تظهر الوصف عند الوقوف عليها) -->
+
     <i class="fas fa-info-circle text-info mr-1"></i>
 
-    <!-- عنوان المهمة -->
+
     <span class="font-weight-bold">{{ $task->title }}</span>
 </td>
 
@@ -186,63 +186,6 @@
     function performDestroy(id, reference) {
         confirmDestroy('/dashboard/tasks/' + id, reference);
     }
-
-    function destroyAll() {
-        Swal.fire({
-            title: 'Delete All Tasks?',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            confirmButtonText: 'Yes!'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                axios.delete('/dashboard/tasks/destroy-all')
-                    .then(function(response) {
-                        showMessage(response.data);
-                        setTimeout(() => location.reload(), 1500);
-                    });
-            }
-        });
-    }
-
-    function toggleComments(taskId) {
-        let row = document.getElementById('comments-' + taskId);
-        row.style.display = row.style.display === 'none' ? '' : 'none';
-    }
-
-$('#search-input').on('keyup', function() {
-    let value = $(this).val().toLowerCase();
-    $("table tbody tr").filter(function() {
-        // نتأكد من عدم إخفاء صفوف التعليقات بالخطأ
-        if(!$(this).attr('id') || !$(this).attr('id').includes('comments')) {
-            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
-        }
-    });
-});
-
-function toggleTaskStatus(id, btn) {
-    axios.post(`/dashboard/tasks/${id}/toggle-status`)
-        .then(response => {
-            if(response.data.success) {
-                location.reload();
-            }
-        });
-}
-
-function toggleStar(id, icon) {
-    axios.post(`/dashboard/tasks/${id}/toggle-star`)
-        .then(response => {
-            if (response.data.success) {
-                if (response.data.is_starred) {
-                    icon.classList.remove('far');
-                    icon.classList.add('fas', 'text-warning');
-                } else {
-                    icon.classList.remove('fas', 'text-warning');
-                    icon.classList.add('far');
-                }
-            }
-        });
-}
 
 </script>
 @endsection
