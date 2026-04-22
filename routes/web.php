@@ -49,4 +49,6 @@ Route::middleware(['auth:admin'])->prefix('dashboard')->group(function () {
     Route::get('admins', [AdminController::class, 'index'])->name('admins.index');
     Route::post('admins', [AdminController::class, 'store'])->name('admins.store');
     Route::delete('admins/{admin}', [AdminController::class, 'destroy'])->name('admins.destroy');
+    Route::post('users', [AdminController::class, 'storeUser'])->name('users.store');
+    Route::delete('users/{user}', [AdminController::class, 'destroyUser'])->name('users.destroy');
 });
