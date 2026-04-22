@@ -90,7 +90,7 @@
 
     <td>{{ $task->status }}</td>
     <td>{{ $task->category->name ?? '-' }}</td>
-    <td>{{ $task->user->name ?? '-' }}</td>
+    <td>{{ $task->user->name ?? 'Admin' }}</td>
 <td>
     @if($task->due_date)
         @php

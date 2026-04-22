@@ -10,12 +10,13 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
-   ->withMiddleware(function (Middleware $middleware) {
-    $middleware->alias([
-        'admin' => \App\Http\Middleware\AdminAuthenticate::class,
-    ]);
-})
-    ->withExceptions(function (Exceptions $exceptions): void {
+    ->withMiddleware(function (Middleware $middleware) {
+        // Register ALL aliases inside this single closure
+        $middleware->alias([
+            'admin'    => \App\Http\Middleware\AdminAuthenticate::class,
+            'auth.any' => \App\Http\Middleware\AuthenticateAdminOrUser::class,
+        ]);
+    })
+    ->withExceptions(function (Exceptions $exceptions) {
         //
     })->create();
-

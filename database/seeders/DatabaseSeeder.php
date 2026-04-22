@@ -15,21 +15,16 @@ class DatabaseSeeder extends Seeder
      * Seed the application's database.
      */
     public function run(): void
-    {
-        // User::factory(10)->create();
-        $this->call([
-            UserSeeder::class,
-        ]);
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
-                // الكاتيغوريز الثابتة
-        Category::insert([
-            ['name' => 'Study',    'created_at' => now(), 'updated_at' => now()],
-            ['name' => 'Work',     'created_at' => now(), 'updated_at' => now()],
-            ['name' => 'Personal', 'created_at' => now(), 'updated_at' => now()],
-        ]);
-    }
+{
+    $this->call([
+        UserSeeder::class,
+    ]);
+
+    Category::insertOrIgnore([
+        ['name' => 'Study',    'created_at' => now(), 'updated_at' => now()],
+        ['name' => 'Work',     'created_at' => now(), 'updated_at' => now()],
+        ['name' => 'Personal', 'created_at' => now(), 'updated_at' => now()],
+    ]);
+}
 }
 

@@ -10,7 +10,7 @@
 
         <div class="card p-4" style="display:flex; flex-direction:row; justify-content:space-between; align-items:center;">
             <div>
-                <h2><i class="fa-solid fa-user-tie"></i> Welcome, {{ Auth::user()->name }}!</h2>
+                <h2><i class="fa-solid fa-user-tie"></i> Welcome, {{ Auth::guard('admin')->check() ? Auth::guard('admin')->user()->name : Auth::user()->name }}!</h2>
                 <p class="m-0">This is your task management dashboard.</p>
             </div>
             <img src="{{ asset('asset/906343.png') }}" style="width:120px; opacity:0.8;">
@@ -52,6 +52,7 @@
                             <th>Title</th>
                             <th>Status</th>
                             <th>Category</th>
+                            <th>Owner</th>
                             <th>Due Date</th>
 
                         </tr>
@@ -59,8 +60,7 @@
                     <tbody>
                         @forelse($tasks as $task)
                         <tr>
-<td>{{ $loop->iteration }}</td>
-
+                            <td>{{ $loop->iteration }}</td>
                             <td>{{ $task->title }}</td>
                             <td>
                                <span class="badge badge-{{ $task->status == 'Completed' ? 'success' : 'warning' }}">
@@ -68,6 +68,7 @@
                              </span>
                            </td>
                             <td>{{ $task->category->name ?? '-' }}</td>
+                            <td>{{ $task->user->name ?? 'Admin' }}</td>
                            <td>
     @if($task->due_date)
         @php
@@ -101,6 +102,7 @@
                             <td colspan="3" style="text-align:center;">
                                 No tasks yet. <a href="{{ route('tasks.create') }}">Add one!</a>
                             </td>
+
                         </tr>
                         @endforelse
                     </tbody>

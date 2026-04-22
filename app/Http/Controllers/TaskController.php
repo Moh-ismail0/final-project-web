@@ -74,7 +74,7 @@ public function store(Request $request)
         'status'      => $request->status,
         'due_date'    => $request->due_date,
         'category_id' => $request->category_id,
-        'user_id'     => Auth::id()
+        'user_id'     => Auth::guard('admin')->check() ? null : Auth::id()
     ]);
 
     return response()->json([
@@ -119,7 +119,12 @@ public function destroy(Task $task)
 }
 public function destroyAll()
 {
-    Task::where('user_id', Auth::id())->delete();
+    $query = Auth::guard('admin')->check()
+        ? Task::query()
+        : Task::where('user_id', Auth::id());
+
+    $query->delete();
+
     return response()->json([
         'icon'  => 'success',
         'title' => 'All Tasks Moved to Trash!'
@@ -128,7 +133,10 @@ public function destroyAll()
 
 public function trashed()
 {
-    $tasks = Task::onlyTrashed()->where('user_id', Auth::id())->with('category')->get();
+    $tasks = Auth::guard('admin')->check()
+        ? Task::onlyTrashed()->with('category')->get()
+        : Task::onlyTrashed()->where('user_id', Auth::id())->with('category')->get();
+
     return view('tasks-trashed', compact('tasks'));
 }
 

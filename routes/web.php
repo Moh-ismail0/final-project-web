@@ -9,8 +9,9 @@ use App\Http\Controllers\CommentController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AdminAuthController;
 
-Route::get('/', function () { return view('welcome');
-})->name('home-login');;
+Route::get('/', function () {
+    return view('welcome');
+})->name('home-login');
 
 // User Auth Routes
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -22,8 +23,8 @@ Route::get('/admin/login', [AdminAuthController::class, 'showLogin'])->name('adm
 Route::post('/admin/login', [AdminAuthController::class, 'login']);
 Route::get('/admin/logout', [AdminAuthController::class, 'logout'])->name('admin.logout');
 
-// Protected Routes - Users
-Route::middleware('auth')->group(function () {
+// Protected Routes - Users & Admins
+Route::middleware(['auth.any'])->group(function () {
     Route::prefix('dashboard')->group(function () {
         Route::get('/', [TaskController::class, 'dashboard'])->name('dashboard');
         Route::get('tasks/trashed', [TaskController::class, 'trashed'])->name('tasks.trashed');
@@ -43,8 +44,8 @@ Route::middleware('auth')->group(function () {
     });
 });
 
-// Protected Routes - Admins
-Route::middleware('auth:admin')->prefix('dashboard')->group(function () {
+// Protected Routes - Admins Only
+Route::middleware(['auth:admin'])->prefix('dashboard')->group(function () {
     Route::get('admins', [AdminController::class, 'index'])->name('admins.index');
     Route::post('admins', [AdminController::class, 'store'])->name('admins.store');
     Route::delete('admins/{admin}', [AdminController::class, 'destroy'])->name('admins.destroy');

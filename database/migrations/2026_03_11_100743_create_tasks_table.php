@@ -18,7 +18,7 @@ return new class extends Migration
         $table->enum('status', ['Pending', 'Completed'])->default('Pending');
         $table->date('due_date')->nullable();
         $table->foreignId('category_id')->constrained()->onDelete('cascade');
-        $table->foreignId('user_id')->constrained()->onDelete('cascade');
+        $table->foreignId('user_id')->nullable()->constrained()->onDelete('cascade');
         $table->softDeletes();
         $table->boolean('is_starred')->default(false);
         $table->timestamps();
