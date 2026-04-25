@@ -112,4 +112,5 @@
 
     </div>
 </div>
+<!-- Last update: 2026-04-20 -->
 @endsection
