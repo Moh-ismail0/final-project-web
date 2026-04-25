@@ -17,6 +17,6 @@ class Category extends Model
     }
     public function comments()
 {
-    return $this->morphMany(Comment::class, 'commentable');
+    return $this->morphMany(Comment::class, 'commentable'); //commentable =>(commentable_id و commentable_type)اسم العلاقة الي هضيفيلي بشكل تلقائي عمودين 
 }
 }
