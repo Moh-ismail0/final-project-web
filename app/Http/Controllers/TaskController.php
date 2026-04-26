@@ -13,8 +13,8 @@ class TaskController extends Controller
 public function dashboard()
 {
     $query = Auth::guard('admin')->check()
-        ? Task::with('category')
-        : Task::where('user_id', Auth::id())->with('category');
+        ? Task::with('category') // اذا كان ادمن اظهرلي كل المهام تاعة كل المستخدمين
+        : Task::where('user_id', Auth::id())->with('category'); //  تاعهid اذا كان مستخدم بس اظهر المهام تاعة هذا المستخدم فقط من خلال 
 
     $tasks     = (clone $query)->orderBy('is_starred', 'desc')->latest()->take(3)->get();
     $total     = (clone $query)->count();
@@ -120,9 +120,9 @@ public function destroy(Task $task)
 public function destroyAll()
 {
     $query = Auth::guard('admin')->check()
-        ? Task::query()
+        ? Task::query()  
         : Task::where('user_id', Auth::id());
-
+// اذا كان ادمن هات كل المهام واذا مستخدم هات المهام الخاصة فيه عن طريقة رقم المستخدم
     $query->delete();
 
     return response()->json([
@@ -148,7 +148,7 @@ public function restore($id)
         'title' => 'Task Restored!'
     ]);
 }
-
+// حذف بشكل دائم للمهمة
 public function forceDelete($id)
 {
     Task::onlyTrashed()->findOrFail($id)->forceDelete();
@@ -159,29 +159,51 @@ public function forceDelete($id)
 }
 public function restoreAll()
 {
-    Task::onlyTrashed()->where('user_id', Auth::id())->restore();
+    if (Auth::guard('admin')->check()) {
+        //إذا كان أدمن: استرجع كل المهام المحذوفة
+        Task::onlyTrashed()->restore();
+    } else {
+        // إذا كان مستخدم عادي: استرجع مهامه فقط
+        Task::onlyTrashed()->where('user_id', Auth::id())->restore();
+    }
+
     return response()->json([
+        'icon' => 'success',
+        'title' => 'All Tasks Restored Successfully!',
         'redirect' => route('tasks.index')
     ]);
 }
-
 public function forceDeleteAll()
 {
-    Task::onlyTrashed()->where('user_id', Auth::id())->forceDelete();
+    if (Auth::guard('admin')->check()) {
+        // إذا كان أدمن: احذف نهائياً كل المهام المحذوفة
+        Task::onlyTrashed()->forceDelete();
+    } else {
+        // إذا كان مستخدم عادي: احذف مهامه فقط
+        Task::onlyTrashed()->where('user_id', Auth::id())->forceDelete();
+    }
+
     return response()->json([
         'icon'  => 'success',
         'title' => 'All Tasks Permanently Deleted!'
     ]);
 }
 
+
+
+
+//عند النقر على الصح  سيتم تنفيذ الاجراء التالي للمهمة
 public function toggleStatus($id) {
     $task = Task::findOrFail($id);
     $task->status = ($task->status == 'Pending') ? 'Completed' : 'Pending';
+    //  والعكسCompleted خليها Pending اذا حالة المهمة 
     $task->save();
     return response()->json(['success' => true, 'new_status' => $task->status]);
 }
+// تشيل أو تحط علامة نجمة 
 public function toggleStar(Task $task)
 {
+    // والعكس  !is_starredخليها is_starred عند النقر على النجمة اذا كانت 
     $task->is_starred = !$task->is_starred;
     $task->save();
 
